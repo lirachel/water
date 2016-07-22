@@ -1,0 +1,24 @@
+{
+    "author": "rachel.li.325@gmail.com",
+    "dependencies": {},
+    "keywords": [],
+    "name": "water",
+    "pebble": {
+        "capabilities": [
+            ""
+        ],
+        "displayName": "water",
+        "enableMultiJS": true,
+        "messageKeys": [],
+        "projectType": "native",
+        "resources": {
+            "media": []
+        },
+        "sdkVersion": "3",
+        "uuid": "0e9c1a25-003b-49b7-8305-bdc4ce57fe5a",
+        "watchapp": {
+            "watchface": false
+        }
+    },
+    "version": "1.0.0"
+}
