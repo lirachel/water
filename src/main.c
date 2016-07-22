@@ -1,8 +1,8 @@
 #include <pebble.h>
 #include <math.h>
 
-static Window *s_intro_window, *s_calculate_window;
-static TextLayer *s_text_layer, *s_calculate_layer;
+static Window *s_intro_window, *s_calculate_window, *s_glass_window, *s_meter_window;
+static TextLayer *s_text_layer, *s_calculate_layer, *s_glass_layer, *s_meter_layer;
 //static GFont s_text_font;
 
 static int weight;
@@ -11,11 +11,14 @@ static char enterWeight[30];
 static int waterNeeded;
 static char waterAmount[100];
 
+static int cupVolume;
+static char enterVolume[100];
+
 static void intro_window_load(Window *window){
 	
 	s_text_layer = text_layer_create(GRect(25, 50, 75, 75));
-	text_layer_set_background_color(s_text_layer, GColorBlack);
- 	text_layer_set_text_color(s_text_layer, GColorWhite);
+	text_layer_set_background_color(s_text_layer, GColorWhite);
+ 	text_layer_set_text_color(s_text_layer, GColorBlack);
 	text_layer_set_font(s_text_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18));
 	text_layer_set_text_alignment(s_text_layer, GTextAlignmentCenter);
 	
@@ -29,6 +32,7 @@ static void intro_window_unload(Window *window){
 	text_layer_destroy(s_text_layer);
 }
 
+
 static void calculate_water_needed(int weight){
 	waterNeeded = weight/2;
 	snprintf(waterAmount, sizeof(waterAmount), "You need %d ounces of water a day!", waterNeeded);
@@ -38,8 +42,8 @@ static void calculate_water_needed(int weight){
 
 static void calculate_window_load(Window *window){
 	s_calculate_layer = text_layer_create(GRect(25, 50, 100, 100));
-	text_layer_set_background_color(s_calculate_layer, GColorBlack);
- 	text_layer_set_text_color(s_calculate_layer, GColorWhite);
+	text_layer_set_background_color(s_calculate_layer, GColorWhite);
+ 	text_layer_set_text_color(s_calculate_layer, GColorBlack);
 	text_layer_set_font(s_calculate_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18));
 	text_layer_set_text_alignment(s_calculate_layer, GTextAlignmentCenter);
 	
@@ -48,9 +52,25 @@ static void calculate_window_load(Window *window){
 }
 
 static void calculate_window_unload(Window *window){
-	
+	text_layer_destroy(s_calculate_layer);
 }
 
+
+static void glass_window_load(Window *window){
+	s_glass_layer = text_layer_create(GRect(25, 50, 75, 75));
+	text_layer_set_background_color(s_glass_layer, GColorWhite);
+ 	text_layer_set_text_color(s_glass_layer, GColorBlack);
+	text_layer_set_font(s_glass_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18));
+	text_layer_set_text_alignment(s_glass_layer, GTextAlignmentCenter);
+	
+	snprintf(enterVolume, sizeof(enterVolume), "Set the volume of your cup: %d oz", cupVolume);
+	text_layer_set_text(s_glass_layer, enterVolume);
+	layer_add_child(window_get_root_layer(s_glass_window), text_layer_get_layer(s_glass_layer));
+}
+
+static void glass_window_unload(Window *window){
+	text_layer_destroy(s_glass_layer);
+}
 
 
 static void select_single_click_handler(ClickRecognizerRef recognizer, void *context) {
@@ -60,14 +80,14 @@ static void select_single_click_handler(ClickRecognizerRef recognizer, void *con
 
 static void up_single_click_handler(ClickRecognizerRef recognizer, void *context) {
   // A single click has just occured
-	weight ++;
+	weight++;
 	snprintf(enterWeight, sizeof(enterWeight), "Enter your weight: %d", weight);
 	text_layer_set_text(s_text_layer, enterWeight);
 }
 
 static void down_single_click_handler(ClickRecognizerRef recognizer, void *context) {
   // A single click has just occured
-	weight --;
+	weight--;
 	if(weight<0){
 		weight = 0;
 	}
@@ -81,39 +101,110 @@ static void click_config_provider(void *context) {
 	window_single_click_subscribe(BUTTON_ID_UP, up_single_click_handler);
 	window_single_click_subscribe(BUTTON_ID_SELECT, select_single_click_handler);
 	window_single_click_subscribe(BUTTON_ID_DOWN, down_single_click_handler);
-
 }
+
+
+static void select_single_click_handler2(ClickRecognizerRef recognizer, void *context) {
+	// A single click has just occured
+	window_stack_push(s_glass_window, true);
+}
+
+static void click_config_provider2(void *context){
+	window_single_click_subscribe(BUTTON_ID_SELECT, select_single_click_handler2);
+}
+
+
+static void select_single_click_handler3(ClickRecognizerRef recognizer, void *context) {
+	// A single click has just occured
+	window_stack_push(s_meter_window, true);
+}
+
+static void up_single_click_handler3(ClickRecognizerRef recognizer, void *context) {
+  // A single click has just occured
+	cupVolume++;
+	
+	snprintf(enterVolume, sizeof(enterVolume), "Set the volume of your cup: %d oz", cupVolume);
+	text_layer_set_text(s_glass_layer, enterVolume);
+}
+
+static void down_single_click_handler3(ClickRecognizerRef recognizer, void *context) {
+  // A single click has just occured
+	cupVolume--;
+	
+	if(cupVolume < 0){
+		cupVolume = 0;
+	}
+	
+	snprintf(enterVolume, sizeof(enterVolume), "Set the volume of your cup: %d oz", cupVolume);
+	text_layer_set_text(s_glass_layer, enterVolume);
+}
+
+static void click_config_provider3(void *context){
+	
+	window_single_click_subscribe(BUTTON_ID_UP, up_single_click_handler3);
+	window_single_click_subscribe(BUTTON_ID_SELECT, select_single_click_handler3);
+	window_single_click_subscribe(BUTTON_ID_DOWN, down_single_click_handler3);
+}
+
+
+static void select_single_click_handler4(ClickRecognizerRef recognizer, void *context) {
+	// A single click has just occured
+	//CHANGE THIS YOOOOOOOOOOOOOOOOOO
+	//window_stack_push(s_   _window, true);
+}
+
+static void click_config_provider4(void *context){
+	
+	window_single_click_subscribe(BUTTON_ID_SELECT, select_single_click_handler4);
+}
+
 
 static void init(){
 	s_intro_window = window_create();
 	s_calculate_window = window_create();
+	s_glass_window = window_create();
+	s_meter_window = window_create();
 	
 	// Use this provider to add button click subscriptions
 	window_set_click_config_provider(s_intro_window, click_config_provider);
+	window_set_click_config_provider(s_calculate_window, click_config_provider2);
+	window_set_click_config_provider(s_glass_window, click_config_provider3);
+	window_set_click_config_provider(s_meter_window, click_config_provider4);
 	
 	window_set_window_handlers(s_intro_window, (WindowHandlers) {
     .load = intro_window_load,
     .unload = intro_window_unload
  	});
-	
 	window_set_background_color(s_intro_window, GColorBlack);
 	
 	window_set_window_handlers(s_calculate_window, (WindowHandlers) {
     .load = calculate_window_load,
     .unload = calculate_window_unload
  	});
-	
 	window_set_background_color(s_calculate_window, GColorBlack);
+	
+	window_set_window_handlers(s_glass_window, (WindowHandlers) {
+    .load = glass_window_load,
+    .unload = glass_window_unload
+ 	});
+	window_set_background_color(s_glass_window, GColorBlack);
+	
+	window_set_window_handlers(s_meter_window, (WindowHandlers) {
+    .load = meter_window_load,
+    .unload = meter_window_unload
+ 	});
+	window_set_background_color(s_meter_window, GColorBlack);
 	
 	window_stack_push(s_intro_window, true);
 }
 
 static void deinit(){
 	window_destroy(s_intro_window);
+	window_destroy(s_calculate_window);
+	window_destroy(s_glass_window);
 }
 
-int main(void)
-{
+int main(void){
 	init();
 	app_event_loop();
 	deinit();
