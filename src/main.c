@@ -101,7 +101,7 @@ static void meter_window_load(Window *window){
 	text_layer_set_font(s_meter_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_JOSEFIN_18)));
 	text_layer_set_text_alignment(s_meter_layer, GTextAlignmentCenter);
 	
-	s_volume_layer = text_layer_create(GRect(15, 130, 80, 148));
+	s_volume_layer = text_layer_create(GRect(10, 130, 85, 38));
 	text_layer_set_background_color(s_volume_layer, GColorClear);
  	text_layer_set_text_color(s_volume_layer, GColorBlack);
 	text_layer_set_font(s_volume_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_JOSEFIN_16)));
@@ -122,10 +122,10 @@ static void meter_window_load(Window *window){
 	s_meter_bitmap = gbitmap_create_with_resource(RESOURCE_ID_METER);
 	bitmap_layer_set_bitmap(s_meter_bitmap_layer, s_meter_bitmap);
 	
-	s_glass_bitmap_layer = bitmap_layer_create(GRect(0, 5, 105, 168));
-	bitmap_layer_set_compositing_mode(s_meter_bitmap_layer, GCompOpSet);
-	bitmap_layer_set_alignment(s_meter_bitmap_layer, GAlignLeft);
-	bitmap_layer_set_background_color(s_meter_bitmap_layer, GColorClear);
+	s_glass_bitmap_layer = bitmap_layer_create(GRect(23, 5, 82, 168));
+	bitmap_layer_set_compositing_mode(s_glass_bitmap_layer, GCompOpSet);
+	bitmap_layer_set_alignment(s_glass_bitmap_layer, GAlignLeft);
+	bitmap_layer_set_background_color(s_glass_bitmap_layer, GColorClear);
 	
 	s_glass_bitmap = gbitmap_create_with_resource(RESOURCE_ID_GLASS);
 	bitmap_layer_set_bitmap(s_glass_bitmap_layer, s_glass_bitmap);
