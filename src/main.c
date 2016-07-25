@@ -2,7 +2,7 @@
 #include <math.h>
 
 static Window *s_intro_window, *s_calculate_window, *s_glass_window, *s_meter_window;
-static TextLayer *s_text_layer, *s_calculate_layer, *s_glass_layer, *s_meter_layer, *s_volume_layer;
+static TextLayer *s_text_layer, *s_text_layer_2, *s_calculate_layer, *s_glass_layer, *s_meter_layer, *s_volume_layer;
 
 static int weight;
 static char enterWeight[30];
@@ -24,6 +24,8 @@ static char volume[100];
 
 int height;
 
+bool hasBeenLaunchedBefore;
+
 static void intro_window_load(Window *window){
 	
 	s_text_layer = text_layer_create(GRect(10, 50, 125, 125));
@@ -31,20 +33,48 @@ static void intro_window_load(Window *window){
  	text_layer_set_text_color(s_text_layer, GColorBlack);
 	text_layer_set_font(s_text_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_JOSEFIN_18)));
 	text_layer_set_text_alignment(s_text_layer, GTextAlignmentCenter);
-	
-	snprintf(enterWeight, sizeof(enterWeight), "Enter your weight: %d lb", weight);
-	text_layer_set_text(s_text_layer, enterWeight);
-	
+	text_layer_set_text(s_text_layer, "Enter your weight:");
 	layer_add_child(window_get_root_layer(s_intro_window), text_layer_get_layer(s_text_layer));
+	
+	s_text_layer_2 = text_layer_create(GRect(10, 70, 125, 125));
+	text_layer_set_background_color(s_text_layer_2, GColorClear);
+ 	text_layer_set_text_color(s_text_layer_2, GColorBlack);
+	text_layer_set_font(s_text_layer_2, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_JOSEFIN_18)));
+	text_layer_set_text_alignment(s_text_layer_2, GTextAlignmentCenter);
+	text_layer_set_text(s_text_layer_2, "0");
+	layer_add_child(window_get_root_layer(s_intro_window), text_layer_get_layer(s_text_layer_2));
+
+	
+	hasBeenLaunchedBefore = persist_read_bool(0);
+  
+	//if it hasnt been launched before, we have to do a little setup
+	if (!hasBeenLaunchedBefore) {
+    	//first we write create a space for our number of glasses to be stored
+    	StatusCode intStatus = persist_write_int(1, weight);
+    	//then we tell the watch that we have launched for the first time
+    	StatusCode boolStatus = persist_write_bool(0, true);
+    	//next we output some info about whether or not the info was saved, this can be ignored
+    	APP_LOG(APP_LOG_LEVEL_DEBUG, "Writing... int code %d" , intStatus);
+    	APP_LOG(APP_LOG_LEVEL_DEBUG, "Writing... bool code %d" , boolStatus);
+	}
+	
+	weight = persist_read_int(1);
+	
+	snprintf(enterWeight, sizeof(enterWeight), "%d lb", weight);
+	text_layer_set_text(s_text_layer_2, enterWeight);
+	layer_add_child(window_get_root_layer(s_intro_window), text_layer_get_layer(s_text_layer_2));
+	
 }
 
 static void intro_window_unload(Window *window){
 	text_layer_destroy(s_text_layer);
+	text_layer_destroy(s_text_layer_2);
 }
 
 
 static void calculate_water_needed(int weight){
 	waterNeeded = weight/2;
+	StatusCode intStatus = persist_write_int(2, waterNeeded);
 	snprintf(waterAmount, sizeof(waterAmount), "You need %d ounces of water a day!", waterNeeded);
 	text_layer_set_text(s_calculate_layer, waterAmount);
 	layer_add_child(window_get_root_layer(s_calculate_window), text_layer_get_layer(s_calculate_layer));
@@ -76,6 +106,25 @@ static void glass_window_load(Window *window){
 	snprintf(enterVolume, sizeof(enterVolume), "Set the volume of your cup: %d oz", cupVolume);
 	text_layer_set_text(s_glass_layer, enterVolume);
 	layer_add_child(window_get_root_layer(s_glass_window), text_layer_get_layer(s_glass_layer));
+	
+	hasBeenLaunchedBefore = persist_read_bool(0);
+  
+	//if it hasnt been launched before, we have to do a little setup
+	if (!hasBeenLaunchedBefore) {
+    	//first we write create a space for our number of glasses to be stored
+    	StatusCode intStatus = persist_write_int(2, cupVolume);
+    	//then we tell the watch that we have launched for the first time
+    	StatusCode boolStatus = persist_write_bool(0, true);
+    	//next we output some info about whether or not the info was saved, this can be ignored
+    	APP_LOG(APP_LOG_LEVEL_DEBUG, "Writing... int code %d" , intStatus);
+    	APP_LOG(APP_LOG_LEVEL_DEBUG, "Writing... bool code %d" , boolStatus);
+	}
+	
+	cupVolume = persist_read_int(2);
+	
+	snprintf(enterVolume, sizeof(enterVolume), "Set the volume of your cup: %d oz", cupVolume);
+	text_layer_set_text(s_glass_layer, enterVolume);
+	layer_add_child(window_get_root_layer(s_glass_window), text_layer_get_layer(s_glass_layer));
 }
 
 static void glass_window_unload(Window *window){
@@ -101,18 +150,39 @@ static void meter_window_load(Window *window){
 	text_layer_set_font(s_meter_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_JOSEFIN_18)));
 	text_layer_set_text_alignment(s_meter_layer, GTextAlignmentCenter);
 	
+	percentage = ((float)waterIntake/(float)waterNeeded)*100;
+	snprintf(percent, sizeof(percent), "%d%%", percentage);
+	text_layer_set_text(s_meter_layer, percent);
+	
+	hasBeenLaunchedBefore = persist_read_bool(0);
+  
+	//if it hasnt been launched before, we have to do a little setup
+	if (!hasBeenLaunchedBefore) {
+    	//first we write create a space for our number of glasses to be stored
+    	StatusCode intStatus = persist_write_int(3, percentage);
+    	//then we tell the watch that we have launched for the first time
+    	StatusCode boolStatus = persist_write_bool(0, true);
+    	//next we output some info about whether or not the info was saved, this can be ignored
+    	APP_LOG(APP_LOG_LEVEL_DEBUG, "Writing... int code %d" , intStatus);
+    	APP_LOG(APP_LOG_LEVEL_DEBUG, "Writing... bool code %d" , boolStatus);
+	}
+	
+	percentage = persist_read_int(3);
+	
+	snprintf(percent, sizeof(percent), "%d%%", percentage);
+	text_layer_set_text(s_meter_layer, percent);
+	layer_add_child(window_get_root_layer(s_meter_window), text_layer_get_layer(s_meter_layer));
+	
+	
 	s_volume_layer = text_layer_create(GRect(10, 130, 85, 38));
 	text_layer_set_background_color(s_volume_layer, GColorClear);
  	text_layer_set_text_color(s_volume_layer, GColorBlack);
 	text_layer_set_font(s_volume_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_JOSEFIN_16)));
 	text_layer_set_text_alignment(s_volume_layer, GTextAlignmentCenter);
 	
-	percentage = ((float)waterIntake/(float)waterNeeded)*100;
-	snprintf(percent, sizeof(percent), "%d%%", percentage);
-	text_layer_set_text(s_meter_layer, percent);
-	
 	snprintf(volume, sizeof(volume), "%d oz / %d oz", waterIntake, waterNeeded);
 	text_layer_set_text(s_volume_layer, volume);
+	
 	
 	s_meter_bitmap_layer = bitmap_layer_create(GRect(105, 0, 39, 168));
 	bitmap_layer_set_compositing_mode(s_meter_bitmap_layer, GCompOpSet);
@@ -152,8 +222,10 @@ static void select_single_click_handler(ClickRecognizerRef recognizer, void *con
 static void up_single_click_handler(ClickRecognizerRef recognizer, void *context) {
 	// A single click has just occured
 	weight++;
-	snprintf(enterWeight, sizeof(enterWeight), "Enter your weight: %d lb", weight);
-	text_layer_set_text(s_text_layer, enterWeight);
+	snprintf(enterWeight, sizeof(enterWeight), "%d lb", weight);
+	text_layer_set_text(s_text_layer_2, enterWeight);
+	layer_add_child(window_get_root_layer(s_intro_window), text_layer_get_layer(s_text_layer_2));
+	StatusCode intStatus = persist_write_int(1, weight);
 }
 
 static void down_single_click_handler(ClickRecognizerRef recognizer, void *context) {
@@ -162,8 +234,10 @@ static void down_single_click_handler(ClickRecognizerRef recognizer, void *conte
 	if(weight<0){
 		weight = 0;
 	}
-	snprintf(enterWeight, sizeof(enterWeight), "Enter your weight: %d", weight);
-	text_layer_set_text(s_text_layer, enterWeight);
+	snprintf(enterWeight, sizeof(enterWeight), "%d lb", weight);
+	text_layer_set_text(s_text_layer_2, enterWeight);
+	layer_add_child(window_get_root_layer(s_intro_window), text_layer_get_layer(s_text_layer_2));
+	StatusCode intStatus = persist_write_int(1, weight);
 }
 
 static void click_config_provider(void *context) {
@@ -193,9 +267,10 @@ static void select_single_click_handler3(ClickRecognizerRef recognizer, void *co
 static void up_single_click_handler3(ClickRecognizerRef recognizer, void *context) {
 	// A single click has just occured
 	cupVolume++;
-	
 	snprintf(enterVolume, sizeof(enterVolume), "Set the volume of your cup: %d oz", cupVolume);
 	text_layer_set_text(s_glass_layer, enterVolume);
+	layer_add_child(window_get_root_layer(s_glass_window), text_layer_get_layer(s_glass_layer));
+	StatusCode intStatus = persist_write_int(2, cupVolume);
 }
 
 static void down_single_click_handler3(ClickRecognizerRef recognizer, void *context) {
@@ -208,6 +283,8 @@ static void down_single_click_handler3(ClickRecognizerRef recognizer, void *cont
 	
 	snprintf(enterVolume, sizeof(enterVolume), "Set the volume of your cup: %d oz", cupVolume);
 	text_layer_set_text(s_glass_layer, enterVolume);
+	layer_add_child(window_get_root_layer(s_glass_window), text_layer_get_layer(s_glass_layer));
+	StatusCode intStatus = persist_write_int(2, cupVolume);
 }
 
 static void click_config_provider3(void *context){
@@ -221,12 +298,15 @@ static void click_config_provider3(void *context){
 static void select_single_click_handler4(ClickRecognizerRef recognizer, void *context) {
 	
 	waterIntake += cupVolume;
+	
+	
 	meter = layer_create(GRect(0, 0, 144, 168));
 	layer_set_update_proc(meter, draw_meter);
 	layer_add_child(window_get_root_layer(s_meter_window), meter);
 	layer_add_child(window_get_root_layer(s_meter_window), bitmap_layer_get_layer(s_meter_bitmap_layer));
 	
 	percentage = ((float)waterIntake/(float)waterNeeded)*100;
+	StatusCode intStatus = persist_write_int(3, percentage);
 	snprintf(percent, sizeof(percent), "%d%%", percentage);
 	//APP_LOG(APP_LOG_LEVEL_DEBUG_VERBOSE, percent);
 	text_layer_set_text(s_meter_layer, percent);
