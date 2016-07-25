@@ -2,7 +2,7 @@
 #include <math.h>
 
 static Window *s_intro_window, *s_calculate_window, *s_glass_window, *s_meter_window;
-static TextLayer *s_text_layer, *s_calculate_layer, *s_glass_layer, *s_meter_layer;
+static TextLayer *s_text_layer, *s_calculate_layer, *s_glass_layer, *s_meter_layer, *s_volume_layer;
 
 static int weight;
 static char enterWeight[30];
@@ -13,13 +13,14 @@ static char waterAmount[100];
 static int cupVolume;
 static char enterVolume[100];
 
-static BitmapLayer *s_meter_bitmap_layer;
-static GBitmap *s_meter_bitmap;
+static BitmapLayer *s_meter_bitmap_layer, *s_glass_bitmap_layer;
+static GBitmap *s_meter_bitmap, *s_glass_bitmap;
 static Layer *meter;
 
 int waterIntake;
 int percentage;
 static char percent[100];
+static char volume[100];
 
 int height;
 
@@ -94,26 +95,47 @@ static void draw_meter(Layer *layer, GContext *ctx){
 }
 
 static void meter_window_load(Window *window){
-	s_meter_layer = text_layer_create(GRect(45, 25, 60, 143));
+	s_meter_layer = text_layer_create(GRect(25, 20, 60, 148));
 	text_layer_set_background_color(s_meter_layer, GColorClear);
  	text_layer_set_text_color(s_meter_layer, GColorBlack);
 	text_layer_set_font(s_meter_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_JOSEFIN_18)));
-	text_layer_set_text_alignment(s_meter_layer, GTextAlignmentLeft);
+	text_layer_set_text_alignment(s_meter_layer, GTextAlignmentCenter);
+	
+	s_volume_layer = text_layer_create(GRect(15, 130, 80, 148));
+	text_layer_set_background_color(s_volume_layer, GColorClear);
+ 	text_layer_set_text_color(s_volume_layer, GColorBlack);
+	text_layer_set_font(s_volume_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_JOSEFIN_16)));
+	text_layer_set_text_alignment(s_volume_layer, GTextAlignmentCenter);
 	
 	percentage = ((float)waterIntake/(float)waterNeeded)*100;
 	snprintf(percent, sizeof(percent), "%d%%", percentage);
 	text_layer_set_text(s_meter_layer, percent);
 	
+	snprintf(volume, sizeof(volume), "%d oz / %d oz", waterIntake, waterNeeded);
+	text_layer_set_text(s_volume_layer, volume);
+	
 	s_meter_bitmap_layer = bitmap_layer_create(GRect(105, 0, 39, 168));
 	bitmap_layer_set_compositing_mode(s_meter_bitmap_layer, GCompOpSet);
-	bitmap_layer_set_alignment(s_meter_bitmap_layer, GAlignRight);
+	bitmap_layer_set_alignment(s_meter_bitmap_layer, GAlignCenter);
 	bitmap_layer_set_background_color(s_meter_bitmap_layer, GColorClear);
 	
 	s_meter_bitmap = gbitmap_create_with_resource(RESOURCE_ID_METER);
 	bitmap_layer_set_bitmap(s_meter_bitmap_layer, s_meter_bitmap);
 	
+	s_glass_bitmap_layer = bitmap_layer_create(GRect(0, 5, 105, 168));
+	bitmap_layer_set_compositing_mode(s_meter_bitmap_layer, GCompOpSet);
+	bitmap_layer_set_alignment(s_meter_bitmap_layer, GAlignLeft);
+	bitmap_layer_set_background_color(s_meter_bitmap_layer, GColorClear);
+	
+	s_glass_bitmap = gbitmap_create_with_resource(RESOURCE_ID_GLASS);
+	bitmap_layer_set_bitmap(s_glass_bitmap_layer, s_glass_bitmap);
+	
+	
+	
 	layer_add_child(window_get_root_layer(s_meter_window), text_layer_get_layer(s_meter_layer));
 	layer_add_child(window_get_root_layer(s_meter_window), bitmap_layer_get_layer(s_meter_bitmap_layer));
+	layer_add_child(window_get_root_layer(s_meter_window), bitmap_layer_get_layer(s_glass_bitmap_layer));
+	layer_add_child(window_get_root_layer(s_meter_window), text_layer_get_layer(s_volume_layer));
 	
 }
 
@@ -130,7 +152,7 @@ static void select_single_click_handler(ClickRecognizerRef recognizer, void *con
 static void up_single_click_handler(ClickRecognizerRef recognizer, void *context) {
 	// A single click has just occured
 	weight++;
-	snprintf(enterWeight, sizeof(enterWeight), "Enter your weight: %d", weight);
+	snprintf(enterWeight, sizeof(enterWeight), "Enter your weight: %d lb", weight);
 	text_layer_set_text(s_text_layer, enterWeight);
 }
 
@@ -206,9 +228,13 @@ static void select_single_click_handler4(ClickRecognizerRef recognizer, void *co
 	
 	percentage = ((float)waterIntake/(float)waterNeeded)*100;
 	snprintf(percent, sizeof(percent), "%d%%", percentage);
-	APP_LOG(APP_LOG_LEVEL_DEBUG_VERBOSE, percent);
+	//APP_LOG(APP_LOG_LEVEL_DEBUG_VERBOSE, percent);
 	text_layer_set_text(s_meter_layer, percent);
 	layer_add_child(window_get_root_layer(s_meter_window), text_layer_get_layer(s_meter_layer));
+	
+	snprintf(volume, sizeof(volume), "%d oz / %d oz", waterIntake, waterNeeded);
+	text_layer_set_text(s_volume_layer, volume);
+	layer_add_child(window_get_root_layer(s_meter_window), text_layer_get_layer(s_volume_layer));
 }
 
 static void click_config_provider4(void *context){

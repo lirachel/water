@@ -14,14 +14,20 @@
         "resources": {
             "media": [
                 {
+                    "file": "images/glass icon.png",
+                    "name": "GLASS",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+                {
                     "file": "fonts/JosefinSans-Light.ttf",
-                    "name": "JOSEFIN_24",
+                    "name": "JOSEFIN_18",
                     "targetPlatforms": null,
                     "type": "font"
                 },
                 {
                     "file": "fonts/JosefinSans-Light.ttf",
-                    "name": "JOSEFIN_18",
+                    "name": "JOSEFIN_16",
                     "targetPlatforms": null,
                     "type": "font"
                 },
