@@ -25,10 +25,10 @@ int height;
 
 static void intro_window_load(Window *window){
 	
-	s_text_layer = text_layer_create(GRect(25, 50, 75, 75));
+	s_text_layer = text_layer_create(GRect(10, 50, 125, 125));
 	text_layer_set_background_color(s_text_layer, GColorClear);
  	text_layer_set_text_color(s_text_layer, GColorBlack);
-	text_layer_set_font(s_text_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18));
+	text_layer_set_font(s_text_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_JOSEFIN_18)));
 	text_layer_set_text_alignment(s_text_layer, GTextAlignmentCenter);
 	
 	snprintf(enterWeight, sizeof(enterWeight), "Enter your weight: %d lb", weight);
@@ -50,10 +50,10 @@ static void calculate_water_needed(int weight){
 }
 
 static void calculate_window_load(Window *window){
-	s_calculate_layer = text_layer_create(GRect(25, 50, 100, 100));
+	s_calculate_layer = text_layer_create(GRect(10, 50, 125, 125));
 	text_layer_set_background_color(s_calculate_layer, GColorClear);
  	text_layer_set_text_color(s_calculate_layer, GColorBlack);
-	text_layer_set_font(s_calculate_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18));
+	text_layer_set_font(s_calculate_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_JOSEFIN_18)));
 	text_layer_set_text_alignment(s_calculate_layer, GTextAlignmentCenter);
 	
 	calculate_water_needed(weight);
@@ -66,10 +66,10 @@ static void calculate_window_unload(Window *window){
 
 
 static void glass_window_load(Window *window){
-	s_glass_layer = text_layer_create(GRect(25, 50, 75, 75));
+	s_glass_layer = text_layer_create(GRect(10, 50, 125, 125));
 	text_layer_set_background_color(s_glass_layer, GColorClear);
  	text_layer_set_text_color(s_glass_layer, GColorBlack);
-	text_layer_set_font(s_glass_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18));
+	text_layer_set_font(s_glass_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_JOSEFIN_18)));
 	text_layer_set_text_alignment(s_glass_layer, GTextAlignmentCenter);
 	
 	snprintf(enterVolume, sizeof(enterVolume), "Set the volume of your cup: %d oz", cupVolume);
@@ -94,10 +94,10 @@ static void draw_meter(Layer *layer, GContext *ctx){
 }
 
 static void meter_window_load(Window *window){
-	s_meter_layer = text_layer_create(GRect(0, 0, 105, 168));
+	s_meter_layer = text_layer_create(GRect(45, 25, 60, 143));
 	text_layer_set_background_color(s_meter_layer, GColorClear);
  	text_layer_set_text_color(s_meter_layer, GColorBlack);
-	text_layer_set_font(s_meter_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18));
+	text_layer_set_font(s_meter_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_JOSEFIN_18)));
 	text_layer_set_text_alignment(s_meter_layer, GTextAlignmentLeft);
 	
 	percentage = ((float)waterIntake/(float)waterNeeded)*100;

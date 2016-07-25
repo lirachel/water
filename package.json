@@ -14,6 +14,18 @@
         "resources": {
             "media": [
                 {
+                    "file": "fonts/JosefinSans-Light.ttf",
+                    "name": "JOSEFIN_24",
+                    "targetPlatforms": null,
+                    "type": "font"
+                },
+                {
+                    "file": "fonts/JosefinSans-Light.ttf",
+                    "name": "JOSEFIN_18",
+                    "targetPlatforms": null,
+                    "type": "font"
+                },
+                {
                     "file": "images/meter.png",
                     "name": "METER",
                     "targetPlatforms": null,
