@@ -12,7 +12,14 @@
         "messageKeys": [],
         "projectType": "native",
         "resources": {
-            "media": []
+            "media": [
+                {
+                    "file": "images/meter.png",
+                    "name": "METER",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                }
+            ]
         },
         "sdkVersion": "3",
         "uuid": "0e9c1a25-003b-49b7-8305-bdc4ce57fe5a",
