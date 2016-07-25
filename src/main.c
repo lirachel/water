@@ -324,16 +324,13 @@ static void click_config_provider4(void *context){
 
 
 static void init(){
+	
+	//if(weight == 0 || cupVolume == 0){
+	
 	s_intro_window = window_create();
 	s_calculate_window = window_create();
 	s_glass_window = window_create();
 	s_meter_window = window_create();
-	
-	// Use this provider to add button click subscriptions
-	window_set_click_config_provider(s_intro_window, click_config_provider);
-	window_set_click_config_provider(s_calculate_window, click_config_provider2);
-	window_set_click_config_provider(s_glass_window, click_config_provider3);
-	window_set_click_config_provider(s_meter_window, click_config_provider4);
 	
 	window_set_window_handlers(s_intro_window, (WindowHandlers) {
     .load = intro_window_load,
@@ -352,14 +349,22 @@ static void init(){
     .unload = glass_window_unload
  	});
 	window_set_background_color(s_glass_window, GColorWhite);
+
 	
+	window_stack_push(s_intro_window, true);
+	//}
+		
+	// Use this provider to add button click subscriptions
+	window_set_click_config_provider(s_intro_window, click_config_provider);
+	window_set_click_config_provider(s_calculate_window, click_config_provider2);
+	window_set_click_config_provider(s_glass_window, click_config_provider3);
+	window_set_click_config_provider(s_meter_window, click_config_provider4);
+		
 	window_set_window_handlers(s_meter_window, (WindowHandlers) {
     .load = meter_window_load,
     .unload = meter_window_unload
  	});
 	window_set_background_color(s_meter_window, GColorWhite);
-	
-	window_stack_push(s_intro_window, true);
 }
 
 static void deinit(){
